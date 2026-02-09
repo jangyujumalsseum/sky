@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리교회 어플리케이션</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+            background: #f5f5f5;
+            padding-bottom: 70px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            overflow-x: auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 100px;
+            padding: 15px 10px;
+            text-align: center;
+            border: none;
+            background: white;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 14px;
+            white-space: nowrap;
+            display: none;
+        }
+
+        .nav-tab.visible {
+            display: block;
+        }
+
+        .nav-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .post-list {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .post-item {
+            padding: 18px;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .post-title:hover {
+            color: #667eea;
+        }
+
+        .post-meta {
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            gap: 10px;
+        }
+
+        .post-badge {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .post-actions {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            display: none;
+            gap: 5px;
+        }
+
+        .post-item:hover .post-actions {
+            display: flex;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .edit-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+        }
+
+        .audio-player {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .audio-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .time-display {
+            font-size: 13px;
+            color: #666;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .add-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            display: none;
+        }
+
+        .add-btn.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 로그인 화면 */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .login-box p {
+            text-align: center;
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .login-btn, .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .guest-btn {
+            width: 100%;
+            padding: 15px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .role-select {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .role-option {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .role-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .role-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .role-option h4 {
+            margin-bottom: 5px;
+        }
+
+        .role-option p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .admin-panel {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .admin-panel h4 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        .permission-list {
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .permission-list div {
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 로그인 화면 -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h2>✝ 우리교회</h2>
+            <p>함께하는 믿음의 공동체</p>
+            
+            <div class="form-group">
+                <label>아이디</label>
+                <input type="text" id="loginId" placeholder="아이디를 입력하세요">
+            </div>
+            
+            <div class="form-group">
+                <label>비밀번호</label>
+                <input type="password" id="loginPw" placeholder="비밀번호를 입력하세요">
+            </div>
+            
+            <button class="login-btn" onclick="login()">로그인</button>
+            <button class="guest-btn" onclick="guestLogin()">방문자로 둘러보기</button>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 13px;">
+                <strong>테스트 계정:</strong><br>
+                • 새신자: guest / 1234 (공지사항, 주일/새벽말씀만)<br>
+                • 일반교인: member / 1234 (성령사연, 수요말씀 추가)<br>
+                • 지도자: leader / 1234 (전체 메뉴)<br>
+                • 관리자: admin / 1234 (편집 권한)
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 앱 -->
+    <div class="app-container" id="appContainer" style="display: none;">
+        <div class="header">
+            <h1>✝ 우리교회</h1>
+            <p>함께하는 믿음의 공동체</p>
+            <div class="user-info">
+                <span class="user-badge" id="userBadge">방문자</span>
+                <button class="logout-btn" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+
+        <div class="nav-tabs" id="navTabs">
+            <button class="nav-tab" data-section="notice" data-role="guest">공지사항</button>
+            <button class="nav-tab" data-section="testimony" data-role="member">성령사연</button>
+            <button class="nav-tab" data-section="sunday" data-role="guest">주일말씀</button>
+            <button class="nav-tab" data-section="dawn" data-role="guest">새벽말씀</button>
+            <button class="nav-tab" data-section="wednesday" data-role="member">수요말씀</button>
+            <button class="nav-tab" data-section="worship" data-role="leader">예배위원</button>
+        </div>
+
+        <div class="content">
+            <!-- 공지사항 -->
+            <div class="section" id="notice">
+                <div class="post-list" id="noticeList"></div>
+            </div>
+
+            <!-- 성령사연 -->
+            <div class="section" id="testimony">
+                <div class="post-list" id="testimonyList"></div>
+            </div>
+
+            <!-- 주일말씀 -->
+            <div class="section" id="sunday">
+                <div id="sundayContent"></div>
+            </div>
+
+            <!-- 새벽말씀 -->
+            <div class="section" id="dawn">
+                <div id="dawnContent"></div>
+            </div>
+
+            <!-- 수요말씀 -->
+            <div class="section" id="wednesday">
+                <div id="wednesdayContent"></div>
+            </div>
+
+            <!-- 예배위원 -->
+            <div class="section" id="worship">
+                <div class="post-list" id="worshipList"></div>
+            </div>
+        </div>
+
+        <button class="add-btn" id="addBtn" onclick="openAddModal()">+</button>
+    </div>
+
+    <!-- 게시글 작성/수정 모달 -->
+    <div class="modal" id="postModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">새 게시글 작성</h2>
+                <button class="close-btn" onclick="closePostModal()">×</button>
+            </div>
+            <form onsubmit="submitPost(event)">
+                <div class="form-group">
+                    <label>카테고리</label>
+                    <select id="postCategory">
+                        <option value="notice">공지사항</option>
+                        <option value="testimony">성령사연</option>
+                        <option value="worship">예배위원</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>제목</label>
+                    <input type="text" id="postTitle" placeholder="제목을 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label>내용</label>
+                    <textarea id="postContent" placeholder="내용을 입력하세요" required></textarea>
+                </div>
+                <input type="hidden" id="editingPostId">
+                <button type="submit" class="submit-btn">게시하기</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 상세보기 모달 -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="detailTitle"></h2>
+                <button class="close-btn" onclick="closeDetailModal()">×</button>
+            </div>
+            <div id="detailContent" style="line-height: 1.8; color: #555;"></div>
+        </div>
+    </div>
+
+    <script>
+        // 사용자 역할 정의
+        const ROLES = {
+            GUEST: 'guest',      // 새신자/방문자
+            MEMBER: 'member',    // 일반 교인
+            LEADER: 'leader',    // 지도자
+            ADMIN: 'admin'       // 관리자
+        };
+
+        // 메뉴별 관리자 권한 (실제로는 서버에서 관리)
+        const MENU_PERMISSIONS = {
+            notice: ['admin'],
+            testimony: ['admin', 'leader'],
+            sunday: ['admin'],
+            dawn: ['admin'],
+            wednesday: ['admin'],
+            worship: ['admin', 'leader']
+        };
+
+        // 현재 사용자 정보
+        let currentUser = {
+            id: '',
+            role: ROLES.GUEST,
+            name: '방문자'
+        };
+
+        // 테스트 계정
+        const TEST_ACCOUNTS = {
+            'guest': { password: '1234', role: ROLES.GUEST, name: '새신자' },
+            'member': { password: '1234', role: ROLES.MEMBER, name: '일반교인' },
+            'leader': { password: '1234', role: ROLES.LEADER, name: '지도자' },
+            'admin': { password: '1234', role: ROLES.ADMIN, name: '관리자' }
+        };
+
+        // 샘플 데이터
+        let posts = {
+            notice: [
+                { id: 1, title: '2024년 하반기 예배 시간 안내', content: '주일 1부 예배: 오전 9시<br>주일 2부 예배: 오전 11시', date: '2024.02.09', views: 156, badge: '중요' },
+                { id: 2, title: '교회 주차장 이용 안내', content: '주차장 이용 시간이 변경되었습니다.', date: '2024.02.08', views: 89 }
+            ],
+            testimony: [
+                { id: 1, title: '기도 응답의 간증', content: '3년간 기도했던 일이 응답되었습니다.', date: '2024.02.05', author: '김은혜' },
+                { id: 2, title: '주님의 치유하심을 경험했습니다', content: '건강이 회복되는 놀라운 역사를 경험했습니다.', date: '2024.02.01', author: '박믿음' }
+            ],
+            worship: [
+                { id: 1, title: '2월 둘째 주 예배 섬김', content: '🎹 찬양: 김찬양, 이예배<br>📖 성경봉독: 박성경<br>🙏 기도: 최기도', date: '2024.02.09' }
+            ]
+        };
+
+        // 로그인
+        function login() {
+            const id = document.getElementById('loginId').value;
+            const pw = document.getElementById('loginPw').value;
+
+            if (!id || !pw) {
+                alert('아이디와 비밀번호를 입력하세요.');
+                return;
+            }
+
+            const account = TEST_ACCOUNTS[id];
+            if (account && account.password === pw) {
+                currentUser = {
+                    id: id,
+                    role: account.role,
+                    name: account.name
+                };
+                enterApp();
+            } else {
+                alert('아이디 또는 비밀번호가 잘못되었습니다.');
+            }
+        }
+
+        // 방문자로 입장
+        function guestLogin() {
+            currentUser = {
+                id: 'guest',
+                role: ROLES.GUEST,
+                name: '방문자'
+            };
+            enterApp();
+        }
+
+        // 앱 진입
+        function enterApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('userBadge').textContent = currentUser.name;
+            
+            setupMenus();
+            renderPosts();
+            
+            // 첫 번째 보이는 탭 활성화
+            const firstVisibleTab = document.querySelector('.nav-tab.visible');
+            if (firstVisibleTab) {
+                firstVisibleTab.click();
+            }
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                document.getElementById('appContainer').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+                currentUser = { id: '', role: ROLES.GUEST, name: '방문자' };
+                document.getElementById('loginId').value = '';
+                document.getElementById('loginPw').value = '';
+            }
+        }
+
+        // 역할에 따른 메뉴 설정
+        function setupMenus() {
+            const tabs = document.querySelectorAll('.nav-tab');
+            const roleHierarchy = {
+                guest: 1,
+                member: 2,
+                leader: 3,
+                admin: 4
+            };
+
+            tabs.forEach(tab => {
+                const requiredRole = tab.dataset.role;
+                const requiredLevel = roleHierarchy[requiredRole];
+                const userLevel = roleHierarchy[currentUser.role];
+
+                if (userLevel >= requiredLevel) {
+                    tab.classList.add('visible');
+                } else {
+                    tab.classList.remove('visible');
+                }
+            });
+
+            // 탭 클릭 이벤트
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const section = tab.dataset.section;
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(section).classList.add('active');
+                    
+                    updateAddButton(section);
+                });
+            });
+        }
+
+        // + 버튼 표시 여부
+        function updateAddButton(section) {
+            const addBtn = document.getElementById('addBtn');
+            const canEdit = MENU_PERMISSIONS[section]?.includes(currentUser.role);
+            
+            if (canEdit && ['notice', 'testimony', 'worship'].includes(section)) {
+                addBtn.classList.add('visible');
+            } else {
+                addBtn.classList.remove('visible');
+            }
+        }
+
+        // 게시글 렌더링
+        function renderPosts() {
+            // 공지사항
+            renderPostList('notice', 'noticeList', (post) => `
+                <div class="post-item">
+                    <div class="post-title" onclick="showDetail('notice', ${post.id})">
+                        ${post.badge ? `<span class="post-badge">${post.badge}</span>` : ''}
+                        ${post.title}
+                    </div>
+                    <div class="post-meta">
+                        <span>📅 ${post.date}</span>
+                        <span>👁 ${post.views}</span>
+                    </div>
+                    ${canEdit('notice') ? `
+                        <div class="post-actions">
+                            <button class="edit-btn" onclick="editPost('notice', ${post.id})">수정</button>
+                            <button class="delete-btn" onclick="deletePost('notice', ${post.id})">삭제</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `);
+
+            // 성령사연
+            renderPostList('testimony', 'testimonyList', (post) => `
+                <div class="post-item">
+                    <div class="post-title" onclick="showDetail('testimony', ${post.id})">
+                        ${post.title}
+                    </div>
+                    <div class="post-meta">
+                        <span>📅 ${post.date}</span>
+                        <span>✍️ ${post.author}</span>
+                    </div>
+                    ${canEdit('testimony') ? `
+                        <div class="post-actions">
+                            <button class="edit-btn" onclick="editPost('testimony', ${post.id})">수정</button>
+                            <button class="delete-btn" onclick="deletePost('testimony', ${post.id})">삭제</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `);
+
+            // 예배위원
+            renderPostList('worship', 'worshipList', (post) => `
+                <div class="post-item">
+                    <div class="post-title">${post.title}</div>
+                    <div class="post-meta" style="display: block; margin-top: 10px;">
+                        ${post.content}
+                    </div>
+                    ${canEdit('worship') ? `
+                        <div class="post-actions">
+                            <button class="edit-btn" onclick="editPost('worship', ${post.id})">수정</button>
+                            <button class="delete-btn" onclick="deletePost('worship', ${post.id})">삭제</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `);
+
+            // 말씀 섹션
+            renderSermons();
+        }
+
+        function renderPostList(category, elementId, template) {
+            const list = document.getElementById(elementId);
+            if (!list) return;
+            
+            const items = posts[category] || [];
+            list.innerHTML = items.map(template).join('');
+        }
+
+        function renderSermons() {
+            // 주일말씀
+            document.getElementById('sundayContent').innerHTML = `
+                <div class="audio-player">
+                    <div class="audio-title">🎙️ 사랑의 실천 (요한복음 13:34-35)</div>
+                    <div class="post-meta" style="margin-bottom: 15px;">
+                        <span>📅 2024.02.09 주일예배</span>
+                        <span>👤 김목사</span>
+                    </div>
+                    <div class="audio-controls">
+                        <button class="play-btn">▶</button>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                        <div class="time-display">00:00 / 45:23</div>
+                    </div>
+                </div>
+            `;
+
+            // 새벽말씀
+            document.getElementById('dawnContent').innerHTML = `
+                <div class="audio-player">
+                    <div class="audio-title">🌅 주의 인도하심 (시편 23편)</div>
+                    <div class="post-meta" style="margin-bottom: 15px;">
+                        <span>📅 2024.02.09 새벽예배</span>
+                        <span>👤 이전도사</span>
+                    </div>
+                    <div class="audio-controls">
+                        <button class="play-btn">▶</button>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                        <div class="time-display">00:00 / 28:45</div>
+                    </div>
+                </div>
+            `;
+
+            // 수요말씀
+            document.getElementById('wednesdayContent').innerHTML = `
+                <div class="audio-player">
+                    <div class="audio-title">📿 기도의 능력 (야고보서 5:13-18)</div>
+                    <div class="post-meta" style="margin-bottom: 15px;">
+                        <span>📅 2024.02.07 수요예배</span>
+                        <span>👤 김목사</span>
+                    </div>
+                    <div class="audio-controls">
+                        <button class="play-btn">▶</button>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                        <div class="time-display">00:00 / 35:20</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 권한 확인
+        function canEdit(section) {
+            return MENU_PERMISSIONS[section]?.includes(currentUser.role);
+        }
+
+        // 게시글 작성 모달
+        function openAddModal() {
+            const activeSection = document.querySelector('.section.active').id;
+            document.getElementById('postCategory').value = activeSection;
+            document.getElementById('modalTitle').textContent = '새 게시글 작성';
+            document.getElementById('editingPostId').value = '';
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postContent').value = '';
+            document.getElementById('postModal').classList.add('active');
+        }
+
+        function closePostModal() {
+            document.getElementById('postModal').classList.remove('active');
+        }
+
+        // 게시글 제출
+        function submitPost(e) {
+            e.preventDefault();
+            
+            const category = document.getElementById('postCategory').value;
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const editingId = document.getElementById('editingPostId').value;
+
+            if (!canEdit(category)) {
+                alert('권한이 없습니다.');
+                return;
+            }
+
+            if (editingId) {
+                // 수정
+                const post = posts[category].find(p => p.id == editingId);
+                if (post) {
+                    post.title = title;
+                    post.content = content;
+                }
+            } else {
+                // 새 게시글
+                const newPost = {
+                    id: Date.now(),
+                    title: title,
+                    content: content,
+                    date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+                    views: 0,
+                    author: currentUser.name
+                };
+                posts[category].unshift(newPost);
+            }
+
+            renderPosts();
+            closePostModal();
+            alert('저장되었습니다!');
+        }
+
+        // 게시글 수정
+        function editPost(category, id) {
+            const post = posts[category].find(p => p.id === id);
+            if (!post) return;
+
+            document.getElementById('postCategory').value = category;
+            document.getElementById('postTitle').value = post.title;
+            document.getElementById('postContent').value = post.content;
+            document.getElementById('editingPostId').value = id;
+            document.getElementById('modalTitle').textContent = '게시글 수정';
+            document.getElementById('postModal').classList.add('active');
+        }
+
+        // 게시글 삭제
+        function deletePost(category, id) {
+            if (!confirm('정말 삭제하시겠습니까?')) return;
+            
+            posts[category] = posts[category].filter(p => p.id !== id);
+            renderPosts();
+            alert('삭제되었습니다.');
+        }
+
+        // 상세보기
+        function showDetail(category, id) {
+            const post = posts[category].find(p => p.id === id);
+            if (!post) return;
+
+            document.getElementById('detailTitle').textContent = post.title;
+            document.getElementById('detailContent').innerHTML = post.content;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // 모달 외부 클릭시 닫기
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
